@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Medicine Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0ede8;
+    --card: #faf8f5;
+    --ink: #1a1612;
+    --ink-soft: #5c5248;
+    --accent: #c0392b;
+    --accent-light: #f9e9e7;
+    --accent-mid: #e8c5c0;
+    --border: #d8d2ca;
+    --result-bg: #1a1612;
+    --result-text: #f0ede8;
+    --input-bg: #fff;
+    --shadow: 0 2px 8px rgba(26,22,18,0.08), 0 16px 48px rgba(26,22,18,0.06);
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, var(--border) 39px, var(--border) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(216,210,202,0.3) 39px, rgba(216,210,202,0.3) 40px);
+  }
+
+  .wrapper {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 2rem;
+    padding: 0 4px;
+  }
+
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .header-tag::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-inner {
+    padding: 2rem;
+  }
+
+  /* Selector */
+  .selector-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--input-bg);
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c5248' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* Formula badge */
+  .formula-strip {
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .formula-strip .fi {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    margin-top: 0.1rem;
+    font-weight: 500;
+  }
+
+  .formula-strip p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  /* Inputs */
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .field-label span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #a09080;
+    font-weight: 400;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--input-bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.4;
+  }
+
+  /* Two-column grid for 4-field calculators */
+  .fields.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* Button */
+  .calc-btn {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.85rem 2rem;
+    background: var(--ink);
+    color: var(--result-text);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .calc-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.15s;
+  }
+
+  .calc-btn:hover { background: #2d2620; }
+  .calc-btn:active { transform: scale(0.985); }
+
+  /* Result */
+  .result-box {
+    margin-top: 1.25rem;
+    background: var(--result-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: none;
+    animation: fadeUp 0.25s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-box.visible { display: block; }
+
+  .result-box.error {
+    background: #3d1410;
+  }
+
+  .result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(240,237,232,0.45);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-main {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    color: var(--result-text);
+    line-height: 1.1;
+  }
+
+  .result-main.error-text {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #f4a09a;
+  }
+
+  .result-sub {
+    margin-top: 0.5rem;
+    font-size: 0.82rem;
+    color: rgba(240,237,232,0.55);
+    line-height: 1.5;
+  }
+
+  .result-sub strong {
+    color: rgba(240,237,232,0.8);
+    font-weight: 500;
+  }
+
+  .result-badge {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-normal { background: #1a3d2b; color: #7ec99a; }
+  .badge-under { background: #1a2d3d; color: #7ab8d9; }
+  .badge-over { background: #3d2e10; color: #d4a060; }
+  .badge-obese { background: #3d1010; color: #d46060; }
+
+  /* Multi-result rows */
+  .result-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .result-row-item { }
+
+  .result-row-item .rri-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,237,232,0.4);
+    margin-bottom: 0.2rem;
+  }
+
+  .result-row-item .rri-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--result-text);
+  }
+
+  /* Footer note */
+  .footer-note {
+    margin-top: 1.5rem;
+    padding: 0 4px;
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .card-inner { padding: 1.25rem; }
+    .fields.two-col { grid-template-columns: 1fr; }
+    .result-rows { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <header>
+    <div class="header-tag">Public Health &amp; Epidemiology</div>
+    <h1>Community<br><em>Medicine</em> Toolkit</h1>
+    <p class="subtitle">Epidemiological &amp; Clinical Calculators for Students &amp; Practitioners</p>
+  </header>
+
+  <div class="card">
+    <div class="card-inner">
+
+      <!-- Dropdown -->
+      <label class="selector-label" for="calcSelect">Select Calculator</label>
+      <select id="calcSelect" onchange="loadCalculator()">
+        <option value="bmi">Body Mass Index (BMI)</option>
+        <option value="attack">Attack Rate</option>
+        <option value="mortality">Mortality Rate (Crude)</option>
+        <option value="cfr">Case Fatality Rate (CFR)</option>
+        <option value="senspec">Sensitivity &amp; Specificity</option>
+        <option value="nnt">Number Needed to Treat (NNT)</option>
+        <option value="dilation">Cervical Dilation Progress</option>
+      </select>
+
+      <div class="divider"></div>
+
+      <!-- Formula strip -->
+      <div class="formula-strip" id="formulaStrip">
+        <span class="fi">fx</span>
+        <p id="formulaText"></p>
+      </div>
+
+      <!-- Dynamic fields -->
+      <div id="fieldsContainer" class="fields"></div>
+
+      <!-- Calculate button -->
+      <button class="calc-btn" onclick="calculate()">Calculate</button>
+
+      <!-- Result -->
+      <div class="result-box" id="resultBox">
+        <div class="result-label" id="resultLabel">Result</div>
+        <div id="resultContent"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="footer-note">
+    ⚕ For educational &amp; clinical reference only. Always verify results with a qualified healthcare professional. Not a substitute for clinical judgment.
+  </p>
+</div>
+
+<script>
+// ─── Calculator Definitions ───────────────────────────────────────────────────
+const calculators = {
+  bmi: {
+    formula: 'BMI = Weight(kg) / Height(m)²',
+    fields: [
+      { id: 'weight', label: 'Weight', unit: 'kg', placeholder: 'e.g. 70' },
+      { id: 'height', label: 'Height', unit: 'cm', placeholder: 'e.g. 170' }
+    ],
+    compute(v) {
+      const w = v.weight, h = v.height / 100;
+      const bmi = w / (h * h);
+      let cat, badge;
+      if (bmi < 18.5)       { cat = 'Underweight';      badge = 'badge-under'; }
+      else if (bmi < 25)    { cat = 'Normal weight';     badge = 'badge-normal'; }
+      else if (bmi < 30)    { cat = 'Overweight';        badge = 'badge-over'; }
+      else if (bmi < 35)    { cat = 'Obese Class I';     badge = 'badge-obese'; }
+      else if (bmi < 40)    { cat = 'Obese Class II';    badge = 'badge-obese'; }
+      else                  { cat = 'Obese Class III';   badge = 'badge-obese'; }
+      return {
+        main: bmi.toFixed(2) + ' kg/m²',
+        label: 'BMI',
+        extra: `<span class="result-badge ${badge}">${cat}</span>`
+      };
+    }
+  },
+
+  attack: {
+    formula: 'Attack Rate = (New Cases / Population at Risk) × 100',
+    fields: [
+      { id: 'cases', label: 'Number of New Cases', unit: 'persons', placeholder: 'e.g. 45' },
+      { id: 'pop', label: 'Population at Risk', unit: 'persons', placeholder: 'e.g. 1000' }
+    ],
+    compute(v) {
+      const rate = (v.cases / v.pop) * 100;
+      return {
+        main: rate.toFixed(4) + '%',
+        label: 'Attack Rate',
+        sub: `<strong>${v.cases}</strong> cases among <strong>${v.pop}</strong> at-risk individuals`
+      };
+    }
+  },
+
+  mortality: {
+    formula: 'Crude Mortality Rate = (Deaths / Mid-year Population) × 1000',
+    fields: [
+      { id: 'deaths', label: 'Number of Deaths', unit: 'persons', placeholder: 'e.g. 120' },
+      { id: 'pop', label: 'Total Mid-year Population', unit: 'persons', placeholder: 'e.g. 500000' }
+    ],
+    compute(v) {
+      const rate = (v.deaths / v.pop) * 1000;
+      return {
+        main: rate.toFixed(4),
+        label: 'Crude Mortality Rate',
+        sub: 'Per <strong>1,000</strong> population'
+      };
+    }
+  },
+
+  cfr: {
+    formula: 'CFR = (Deaths from Disease / Confirmed Cases) × 100',
+    fields: [
+      { id: 'deaths', label: 'Deaths from Disease', unit: 'persons', placeholder: 'e.g. 30' },
+      { id: 'cases', label: 'Confirmed Cases', unit: 'persons', placeholder: 'e.g. 500' }
+    ],
+    compute(v) {
+      if (v.deaths > v.cases) throw new Error('Deaths cannot exceed confirmed cases.');
+      const rate = (v.deaths / v.cases) * 100;
+      return {
+        main: rate.toFixed(4) + '%',
+        label: 'Case Fatality Rate'
+      };
+    }
+  },
+
+  senspec: {
+    formula: 'Sensitivity = TP/(TP+FN)×100   |   Specificity = TN/(TN+FP)×100',
+    fields: [
+      { id: 'tp', label: 'True Positives', unit: 'TP', placeholder: 'e.g. 80' },
+      { id: 'fn', label: 'False Negatives', unit: 'FN', placeholder: 'e.g. 20' },
+      { id: 'tn', label: 'True Negatives', unit: 'TN', placeholder: 'e.g. 90' },
+      { id: 'fp', label: 'False Positives', unit: 'FP', placeholder: 'e.g. 10' }
+    ],
+    twoCol: true,
+    compute(v) {
+      const sen = (v.tp / (v.tp + v.fn)) * 100;
+      const spe = (v.tn / (v.tn + v.fp)) * 100;
+      return {
+        multi: [
+          { label: 'Sensitivity', val: sen.toFixed(2) + '%' },
+          { label: 'Specificity', val: spe.toFixed(2) + '%' }
+        ],
+        label: 'Diagnostic Test Performance',
+        sub: `PPV and NPV depend on disease prevalence in the tested population.`
+      };
+    }
+  },
+
+  nnt: {
+    formula: 'ARR = CER − EER   |   NNT = 100 / ARR',
+    fields: [
+      { id: 'cer', label: 'Control Event Rate (CER)', unit: '%', placeholder: 'e.g. 20' },
+      { id: 'eer', label: 'Experimental Event Rate (EER)', unit: '%', placeholder: 'e.g. 12' }
+    ],
+    compute(v) {
+      const arr = v.cer - v.eer;
+      if (arr <= 0) {
+        return {
+          main: 'N/A',
+          label: 'Number Needed to Treat',
+          sub: 'No benefit detected (ARR ≤ 0). The treatment does not reduce event rate.'
+        };
+      }
+      const nnt = Math.ceil(100 / arr);
+      return {
+        main: nnt.toString(),
+        label: 'Number Needed to Treat',
+        sub: `ARR = <strong>${arr.toFixed(2)}%</strong>. Treat <strong>${nnt}</strong> patients to prevent one additional event.`
+      };
+    }
+  },
+
+  dilation: {
+    formula: 'Time to full dilation = (10 − current dilation) / 1 cm per hour',
+    fields: [
+      { id: 'dilation', label: 'Current Cervical Dilation', unit: 'cm', placeholder: 'e.g. 6' },
+      { id: 'hours', label: 'Time Since Last Exam', unit: 'hours', placeholder: 'e.g. 2' }
+    ],
+    compute(v) {
+      if (v.dilation >= 10) {
+        return { main: 'Full dilation reached', label: 'Cervical Dilation', sub: 'Patient is at 10 cm.' };
+      }
+      const remaining = 10 - v.dilation;
+      const hrs = remaining / 1.0;
+      const h = Math.floor(hrs);
+      const m = Math.round((hrs - h) * 60);
+      let timeStr = h > 0 ? `${h}h ${m}m` : `${m} min`;
+      let note = '';
+      if (v.dilation < 4) {
+        note = '⚠ Estimate applies to active labor (≥4 cm). Current dilation suggests latent phase — progress may vary significantly.';
+      }
+      return {
+        main: `~${timeStr}`,
+        label: 'Estimated Time to Full Dilation',
+        sub: note || `<strong>${remaining} cm</strong> remaining at 1 cm/hour (Friedman's rule, nulliparous).`,
+        warn: !!note
+      };
+    }
+  }
+};
+
+// ─── Render Fields ────────────────────────────────────────────────────────────
+function loadCalculator() {
+  const key = document.getElementById('calcSelect').value;
+  const calc = calculators[key];
+
+  // Formula
+  document.getElementById('formulaText').textContent = calc.formula;
+
+  // Fields
+  const container = document.getElementById('fieldsContainer');
+  container.className = 'fields' + (calc.twoCol ? ' two-col' : '');
+  container.innerHTML = calc.fields.map(f => `
+    <div class="field-group">
+      <label class="field-label" for="f_${f.id}">${f.label} <span>${f.unit}</span></label>
+      <input type="number" id="f_${f.id}" placeholder="${f.placeholder}" min="0" step="any">
+    </div>
+  `).join('');
+
+  // Reset result
+  const rb = document.getElementById('resultBox');
+  rb.className = 'result-box';
+  document.getElementById('resultContent').innerHTML = '';
+}
+
+// ─── Calculate ────────────────────────────────────────────────────────────────
+function calculate() {
+  const key = document.getElementById('calcSelect').value;
+  const calc = calculators[key];
+  const rb = document.getElementById('resultBox');
+  const rc = document.getElementById('resultContent');
+  const rl = document.getElementById('resultLabel');
+
+  // Collect values
+  let values = {};
+  let errMsg = '';
+  for (const f of calc.fields) {
+    const el = document.getElementById('f_' + f.id);
+    const raw = el.value.trim();
+    if (raw === '') { errMsg = `Please enter a value for "${f.label}".`; break; }
+    const num = parseFloat(raw);
+    if (isNaN(num)) { errMsg = `"${f.label}" must be a valid number.`; break; }
+    if (num < 0) { errMsg = `"${f.label}" cannot be negative.`; break; }
+    values[f.id] = num;
+  }
+
+  rb.classList.remove('error');
+
+  if (errMsg) {
+    rb.className = 'result-box visible error';
+    rl.textContent = 'Input Error';
+    rc.innerHTML = `<div class="result-main error-text">${errMsg}</div>`;
+    return;
+  }
+
+  // Check division by zero candidates
+  try {
+    if (key === 'attack' && values.pop === 0) throw new Error('Population at risk cannot be zero.');
+    if (key === 'mortality' && values.pop === 0) throw new Error('Population cannot be zero.');
+    if (key === 'cfr' && values.cases === 0) throw new Error('Number of confirmed cases cannot be zero.');
+    if (key === 'senspec') {
+      if ((values.tp + values.fn) === 0) throw new Error('TP + FN cannot be zero.');
+      if ((values.tn + values.fp) === 0) throw new Error('TN + FP cannot be zero.');
+    }
+    if (key === 'bmi' && values.height === 0) throw new Error('Height cannot be zero.');
+    if (key === 'dilation' && values.dilation > 10) throw new Error('Dilation cannot exceed 10 cm.');
+
+    const result = calc.compute(values);
+    rl.textContent = result.label || 'Result';
+    rb.className = 'result-box visible';
+
+    if (result.multi) {
+      // Multi-value result (Sensitivity & Specificity)
+      rc.innerHTML = `
+        <div class="result-rows">
+          ${result.multi.map(r => `
+            <div class="result-row-item">
+              <div class="rri-label">${r.label}</div>
+              <div class="rri-val">${r.val}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${result.sub ? `<div class="result-sub" style="margin-top:0.75rem">${result.sub}</div>` : ''}
+      `;
+    } else {
+      rc.innerHTML = `
+        <div class="result-main">${result.main}</div>
+        ${result.extra || ''}
+        ${result.sub ? `<div class="result-sub" style="${result.warn ? 'color:#f4c47a' : ''};margin-top:0.4rem">${result.sub}</div>` : ''}
+      `;
+    }
+
+  } catch(e) {
+    rb.className = 'result-box visible error';
+    rl.textContent = 'Calculation Error';
+    rc.innerHTML = `<div class="result-main error-text">${e.message}</div>`;
+  }
+}
+
+// ─── Allow Enter key ──────────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') calculate();
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadCalculator();
+</script>
+</body>
+</html>
